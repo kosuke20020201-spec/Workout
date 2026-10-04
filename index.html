@@ -34,7 +34,8 @@ const GL=[['筋力',3,6],['筋肥大',0,0],['高回数',15,25]];
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),esc=s=>String(s).replace(/"/g,'&quot;');
 function nm(s){return String(s).toLowerCase().replace(/[\s・_\-\.\(\)（）]/g,'')}
 function pp(s){const o={};(s||'').trim().split(/\s+/).filter(Boolean).forEach(t=>{const[k,v]=t.split(':'),x=parseFloat(v);if(P[k]&&!isNaN(x))o[k]=x});return o}
-function pv(s){return(s||'').split(';').filter(x=>x.trim()).map(l=>{const[n,d]=l.split('|');return[n.trim(),pp(d)]})}
+function pv(s){return(s||'').split(';').filter(x=>x.trim()).map(l=>{const[n,d,f,t]=l.split('|'),o={};(f||'').trim().split(/\s+/).forEach(k=>{const[a,b]=k.split('=');if(a=='u')o.u=+b;if(a=='w')o.w=b});if(t)o.n=t;return[n.trim(),pp(d),o]})}
+const UNI=['dbr','bsq'],vd=d=>Object.entries(d).map(([k,x])=>k+':'+x).join(' ');
 const vs=v=>v.map(([n,d])=>n+'|'+Object.entries(d).map(([k,x])=>k+':'+x).join(' ')).join('\n');
 // 効く部位の係数は筋電図研究・種目解説を参考にした目安値（胸:Cabral 2021ほか／三頭:Maeo 2022ほか）。種目編集で調整可
 // id,名前,器具(B D M C W),部位:係数,負荷(1-3),rep下限,上限,刻み,tag,別名,フォーム(名|部位:加減;…)
@@ -92,7 +93,7 @@ C.last=Date.now();saveC();save(1);rebuild();setCS('ok');if(!XE&&!/INPUT|SELECT|T
 const OP=new Set();let EX,EXB,tab='m',LG={},LK={},SF={},PL,XE=null;
 function fin(e){const g={};for(const p in e.pt)g[P[p][1]]=Math.max(g[P[p][1]]||0,e.pt[p]);
 e.p=Object.keys(g).filter(k=>g[k]>=.6);e.s=Object.keys(g).filter(k=>g[k]<.6);if(!e.p.length)e.p=Object.keys(g).sort((a,b)=>g[b]-g[a]).slice(0,1);
-e.k=[e.n,...(e.al||[])].map(nm);if(!e.v||!e.v.length)e.v=[['標準',{}]]}
+e.k=[e.n,...(e.al||[])].map(nm);if(!e.v||!e.v.length)e.v=[['標準',{}]];e.v.forEach(x=>{x[2]=Object.assign({u:UNI.includes(e.id)?1:0,w:e.eq=='D'?'e':'t',n:''},x[2]||{})})}
 function rebuild(){EX=[...PRE.map(e=>ed(e.id)?D.xo[e.id]:e),...Object.values(D.xo).filter(e=>e.id[0]=='u'&&!e.del)];EX.forEach(fin);EXB=Object.fromEntries(EX.map(e=>[e.id,e]))}rebuild();
 const coefOf=(e,fi)=>{const c={...e.pt},d=(e.v[fi]||e.v[0])[1];for(const p in d)c[p]=clamp((c[p]||0)+d[p],0,1.2);for(const p in c)if(c[p]<.05)delete c[p];return c};
 const Rp=(F,p,v=0)=>100*Math.exp(-(F[p]+v)/P[p][3]);
@@ -104,8 +105,8 @@ for(const p in c)F[p]+=k*c[p]*Math.exp(-h/P[p][2])}}return F}
 function sug(e,fi,gi,F){const G0=GL[gi],lo=G0[1]||e.lo,hi=G0[2]||e.hi,hs=D.ses.filter(s=>s.it.some(i=>i.ex==e.id)).sort((a,b)=>b.t-a.t);
 const f=s=>s.it.find(i=>i.ex==e.id),same=hs.find(s=>(f(s).f||0)==fi),src=same?f(same):hs[0]&&f(hs[0]);
 if(!src)return{w:'',r:lo,lo,hi,note:'初回：軽めで感覚をつかんで重量を入力'};
-const it=src.s,w=Math.max(...it.map(x=>x.w)),rs=it.filter(x=>x.w==w).map(x=>x.r),mr=Math.min(...rs),rd=e.p.reduce((a,g)=>a+Rg(F,g),0)/e.p.length;
-let nw=w,nr,note=`前回 ${w}kg×${rs.join(',')}`;
+const o0=e.v[fi]?e.v[fi][2]:e.v[0][2],sb=src.b||(e.eq=='D'?'e':'t'),cf=(!o0.u&&!src.u&&sb!=o0.w)?(o0.w=='e'?.5:2):1,it=src.s.map(x=>({w:x.w*cf,r:x.r})),w=Math.max(...it.map(x=>x.w)),rs=it.filter(x=>x.w==w).map(x=>x.r),mr=Math.min(...rs),rd=e.p.reduce((a,g)=>a+Rg(F,g),0)/e.p.length;
+let nw=w,nr,note=`前回 ${+w.toFixed(2)}kg${cf!=1?'（'+(o0.w=='e'?'片側':'合計')+'に換算）':''}×${rs.join(',')}`;
 if(same&&mr>=lo&&mr<=hi){nr=Math.min(mr+1,hi);if(mr>=hi&&e.inc){nw=w+e.inc;nr=lo;note+=' → 上限到達で重量UP'}else note+=mr>=hi?' → 同重量キープ':' → 回数+1'}
 else{const e1=Math.max(...it.map(x=>x.w*(1+x.r/30)));nw=e1/(1+(lo+2)/30);nr=lo;note+=`（推定1RM ${Math.round(e1)}kg → ${lo}回狙いで換算${same?'':'・別フォームの記録から'}）`}
 if(rd<50){nw*=.93;note+='（疲労が残ってるので約7%軽く）'}
@@ -139,25 +140,25 @@ function setF(key,i){SF[key]=SF[key]||{};SF[key].f=+i;draw()}
 function setG(key,i){SF[key]=SF[key]||{};SF[key].g=+i;draw()}
 function vMenu(){const{sp,sk,rec,sc,sl,sum,bud,F}=PL,keys=Object.keys(sp.s);
 let h='';if(keys.length>1)h+=`<div class="seg" style="margin-bottom:12px">${keys.map(k=>`<button class="${k==sk?'on':''}" onclick="setSess('${k}')">${sp.s[k].n}${k==rec?' ★':''} ${Math.round(sc[k])}%</button>`).join('')}</div>`;
-h+=`<div class="card mut">${sp.n}／${sp.s[sk].n}　${sum}セット（目安 ${Math.round(sum*3.5+5)}分）。★＝いま一番回復してる部位。％は回復度。種目・フォーム・狙いを変えると、残りの種目と重量・回数を再計算するで。${sum<bud-1?`<br>疲労の残ってる部位は ${bud-sum} セット減らしてある。`:''}</div>`;
+h+=`<div class="card mut">${sp.n}／${sp.s[sk].n}　${sum}セット（目安 ${Math.round(sl.reduce((a,s)=>a+s.n*(s.e.v[s.f][2].u?1.5:1),0)*3.5+5)}分）。★＝いま一番回復してる部位。％は回復度。種目・フォーム・狙いを変えると、残りの種目と重量・回数を再計算するで。${sum<bud-1?`<br>疲労の残ってる部位は ${bud-sum} セット減らしてある。`:''}</div>`;
 if(!sl.length)return h+'<div class="card">今日は全体的に回復途中。休むか、別の部位を選んでや。</div>';
-sl.forEach(s=>{const k=s.key+'|'+s.e.id+'|'+s.f+'|'+s.gi,a=LG[k]=LG[k]||Array.from({length:s.n},()=>({w:s.g.w,r:s.g.r,d:0})),g0=s.x.split(':')[0],cf=coefOf(s.e,s.f);
+sl.forEach(s=>{const k=s.key+'|'+s.e.id+'|'+s.f+'|'+s.gi,a=LG[k]=LG[k]||Array.from({length:s.n},()=>({w:s.g.w,r:s.g.r,d:0})),g0=s.x.split(':')[0],cf=coefOf(s.e,s.f),o=s.e.v[s.f][2];
 h+=`<div class="card"><div class="mu">${G[g0]}${s.x.includes(':')?'（'+(s.x.endsWith('rear')?'後部':'中部')+'）':''}${LK[s.key]?'　手動選択':''}</div>
 <select onchange="pick('${s.key}',this.value)">${s.c.map((e,i)=>{const r=Math.min(...e.p.map(g=>Rg(F,g)));return`<option value="${e.id}" ${e.id==s.e.id?'selected':''}>${i==0?'★ ':''}${e.n}${r<40?'（疲労大）':''}</option>`}).join('')}</select>
 <div class="row" style="margin-top:6px"><select onchange="setF('${s.key}',this.value)">${s.e.v.map((x,i)=>`<option value="${i}" ${i==s.f?'selected':''}>${x[0]}</option>`).join('')}</select><select onchange="setG('${s.key}',this.value)">${GL.map((x,i)=>`<option value="${i}" ${i==s.gi?'selected':''}>${x[0]} ${x[1]||s.e.lo}-${x[2]||s.e.hi}回</option>`).join('')}</select></div>
 <div class="mut" style="margin-top:6px">効く部位：${Object.entries(cf).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([p,x])=>P[p][0]+' '+Math.round(x*100)+'%').join('・')}</div>
-<div class="tg">${s.g.w===''?'—':s.g.w}<small>kg</small>${s.g.r}<small>回 × ${s.n}set</small></div><div class="mut">${s.g.note}</div>
+<div class="mut">${o.u?'<b>片手・片脚ずつ</b>（左右で1セット）　':''}重量は${o.w=='e'?'<b>片側・1個あたり</b>':'<b>合計</b>'}${o.n?'<br>指示：'+o.n.replace(/</g,'&lt;'):''}</div><div class="tg">${s.g.w===''?'—':s.g.w}<small>kg${o.w=='e'?'/片側':''}</small>${s.g.r}<small>回 × ${s.n}set</small></div><div class="mut">${s.g.note}</div>
 <div style="margin-top:8px">${a.map((x,i)=>`<div class="st"><i>${i+1}</i><input type="number" step="any" inputmode="decimal" value="${x.w}" oninput="LG['${k}'][${i}].w=this.value">kg<input type="number" inputmode="numeric" value="${x.r}" oninput="LG['${k}'][${i}].r=this.value">回<input type="checkbox" ${x.d?'checked':''} onchange="LG['${k}'][${i}].d=this.checked"></div>`).join('')}</div></div>`});
 return h+'<button class="btn" onclick="done()">チェックしたセットを記録して終了</button>'}
-function done(){const it=[];for(const s of PL.sl){const a=(LG[s.key+'|'+s.e.id+'|'+s.f+'|'+s.gi]||[]).filter(x=>x.d&&+x.r>0);if(a.length)it.push({ex:s.e.id,f:s.f,g:s.gi,s:a.map(x=>({w:+x.w||0,r:+x.r}))})}
+function done(){const it=[];for(const s of PL.sl){const a=(LG[s.key+'|'+s.e.id+'|'+s.f+'|'+s.gi]||[]).filter(x=>x.d&&+x.r>0);if(a.length)it.push({ex:s.e.id,f:s.f,g:s.gi,b:s.e.v[s.f][2].w,u:s.e.v[s.f][2].u,s:a.map(x=>({w:+x.w||0,r:+x.r}))})}
 if(!it.length)return alert('チェックの入ったセットがないで');D.ses.push({id:'m'+Date.now(),t:Date.now(),sp:D.st.split,it});D.st.sess='';save();LG={};LK={};SF={};tab='r';draw()}
 function vRec(){const F=PL.F,n=Date.now(),bar=r=>`<div class="bar"><b style="width:${r}%;background:${col(r)}"></b></div>`;
 return'<div class="card"><h3>部位ごとの回復度</h3>'+Object.keys(G).sort((a,b)=>Rg(F,a)-Rg(F,b)).map(g=>{const r=Math.round(Rg(F,g));let t=0;for(const s of D.ses)if(s.t>t&&s.it.some(i=>EXB[i.ex]&&EXB[i.ex].p.includes(g)))t=s.t;
 return`<div class="rc"><span><b>${G[g]}</b><div class="mut" style="font-size:11px">${t?Math.round((n-t)/36e5)+'時間前':'記録なし'}</div></span>${bar(r)}<span>${r}%</span></div>`+(GP[g].length>1?GP[g].map(p=>{const q=Math.round(Rp(F,p));return`<div class="rc sub"><span>${P[p][0]}</span>${bar(q)}<span>${q}%</span></div>`}).join(''):'')}).join('')+'<div class="mut" style="margin-top:8px">セットごとに、種目・フォームの係数ぶんだけ各部位に疲労を積み、部位ごとの回復時間で指数的に減らす簡易モデル。</div></div>'}
 function vAdd(){return`<div class="card"><h3>過去の記録を追加</h3><input type="date" id="ad" value="${new Date().toISOString().slice(0,10)}" style="margin-bottom:8px"><select id="ae" style="margin-bottom:8px">${Object.keys(G).filter(g=>EX.some(e=>e.p[0]==g)).map(g=>`<optgroup label="${G[g]}">${EX.filter(e=>e.p[0]==g).map(e=>`<option value="${e.id}">${e.n}</option>`).join('')}</optgroup>`).join('')}</select><div class="row"><input type="number" id="aw" step="any" placeholder="kg">kg<input type="number" id="ar" placeholder="回">回 ×<input type="number" id="an" value="3" style="width:56px">set</div><button class="btn g" onclick="addH()">追加</button></div>`}
-function addH(){const w=+aw.value||0,r=+ar.value,n=+an.value||1,t=Date.parse(ad.value+'T12:00:00');if(!(r>0)||isNaN(t))return alert('日付と回数を入れてや');D.ses.push({id:'m'+Date.now(),t,sp:'man',it:[{ex:ae.value,s:Array.from({length:n},()=>({w,r}))}]});save();draw()}
+function addH(){const w=+aw.value||0,r=+ar.value,n=+an.value||1,t=Date.parse(ad.value+'T12:00:00');if(!(r>0)||isNaN(t))return alert('日付と回数を入れてや');D.ses.push({id:'m'+Date.now(),t,sp:'man',it:[{ex:ae.value,f:0,b:EXB[ae.value].v[0][2].w,u:EXB[ae.value].v[0][2].u,s:Array.from({length:n},()=>({w,r}))}]});save();draw()}
 function vHist(){const A=vAdd();if(!D.ses.length)return A+'<div class="card mut">まだ記録なし。上から過去の記録を入れるか、メニューから記録してや。</div>';
-return A+D.ses.slice().sort((a,b)=>b.t-a.t).slice(0,60).map(s=>`<div class="card"><div class="row sp"><b>${new Date(s.t).toLocaleDateString('ja-JP')}</b><button style="border:0;background:none;color:#c33;font:inherit" onclick="delS('${s.id}')">削除</button></div>${s.it.map(i=>{const e=EXB[i.ex]||{n:i.ex,v:[]};return`<div class="mut"><b style="color:var(--ink)">${e.n}</b>${i.f&&e.v[i.f]?'（'+e.v[i.f][0]+'）':''}　${i.s.map(x=>x.w+'×'+x.r).join(' , ')}</div>`}).join('')}</div>`).join('')}
+return A+D.ses.slice().sort((a,b)=>b.t-a.t).slice(0,60).map(s=>`<div class="card"><div class="row sp"><b>${new Date(s.t).toLocaleDateString('ja-JP')}</b><button style="border:0;background:none;color:#c33;font:inherit" onclick="delS('${s.id}')">削除</button></div>${s.it.map(i=>{const e=EXB[i.ex]||{n:i.ex,v:[]};return`<div class="mut"><b style="color:var(--ink)">${e.n}</b>${i.f&&e.v[i.f]?'（'+e.v[i.f][0]+'）':''}　${i.s.map(x=>x.w+'×'+x.r).join(' , ')}${i.b=='e'?'（片側kg）':''}${i.u?'　片手ずつ':''}</div>`}).join('')}</div>`).join('')}
 function delS(id){if(confirm('この記録を消す？')){D.ses=D.ses.filter(s=>s.id!=id);D.del.push(id);save();draw()}}
 function vSet(){const q=D.st;return`<div class="card"><h3>クラウド同期（Google Apps Script）</h3><input type="text" id="cu" placeholder="Web AppのURL（…/exec）" value="${esc(C.url||'')}" style="margin-bottom:6px"><input type="text" id="ct" placeholder="合言葉（スクリプトのTOKEN）" value="${esc(C.token||'')}"><button class="btn" onclick="C.url=cu.value.trim();C.token=ct.value.trim();saveC();sync()">保存して今すぐ同期</button><div class="mut" style="margin-top:8px">${C.url?(CE?'エラー：'+esc(CE):C.last?'最終同期：'+new Date(C.last).toLocaleString('ja-JP'):'未同期'):'未設定'}　記録・種目の編集が自動で同期される（設定は端末ごと）。</div></div>`+`<div class="card"><h3>1回の総セット数</h3><div class="row"><input type="number" value="${q.budget||''}" placeholder="${SP[q.split].b}" onchange="D.st.budget=+this.value||0;save();draw()"><span class="mut">空欄＝${SP[q.split].n}の標準（${SP[q.split].b}）</span></div></div>
 <div class="card"><h3>使える器具</h3>${[['B','バーベル'],['D','ダンベル'],['M','マシン'],['C','ケーブル'],['W','自重']].map(a=>`<label class="ck"><input type="checkbox" ${q.eq[a[0]]?'checked':''} onchange="D.st.eq['${a[0]}']=this.checked?1:0;save();LK={};draw()">${a[1]}</label>`).join('')}</div>
@@ -166,8 +167,11 @@ function vSet(){const q=D.st;return`<div class="card"><h3>クラウド同期（G
 <div class="card"><h3>Workoutアプリの記録を取り込む</h3><div class="mut" style="margin-bottom:8px">CSVの日付・種目・重量・回数の列を自動判別。同じ日は上書き。</div><input type="file" accept=".csv,.txt,text/csv" onchange="impCSV(this.files[0])"></div>
 <div class="card"><h3>バックアップ</h3><button class="btn g" style="margin:0" onclick="exp()">JSONを書き出す</button><button class="btn g" onclick="document.getElementById('jf').click()">JSONから復元</button><input id="jf" type="file" accept=".json" hidden onchange="impJ(this.files[0])"></div>`}
 function xedit(id){const e=EXB[id];XE=JSON.parse(JSON.stringify({id:e.id,n:e.n,eq:e.eq,g:e.p[0],pt:e.pt,c:e.c,lo:e.lo,hi:e.hi,inc:e.inc,tag:e.tag,al:e.al||[],v:e.v}));draw()}
-function xnew(){XE={id:'u'+Date.now(),n:'',eq:'M',g:'ch',pt:{},c:1,lo:8,hi:12,inc:2.5,tag:'',al:[],v:[['標準',{}]],nw:1};draw()}
+function xnew(){XE={id:'u'+Date.now(),n:'',eq:'M',g:'ch',pt:{},c:1,lo:8,hi:12,inc:2.5,tag:'',al:[],v:[['標準',{},{u:0,w:'t',n:''}]],nw:1};draw()}
 function xmain(q){if(q){XE.pt[q]=1;draw()}}
+function vo(i,k,x){XE.v[i][2][k]=x}
+function vadd(){XE.v.push(['新しいフォーム',{},{u:0,w:XE.v[0][2].w,n:''}]);draw()}
+function vdel(i){if(confirm('削除すると、過去記録のフォーム表示がずれるで。ええ？')){XE.v.splice(i,1);draw()}}
 function xp(p,x){x=parseFloat(x);if(x>0)XE.pt[p]=x;else delete XE.pt[p]}
 function xv(t){XE.v=pv(t.replace(/\n/g,';'));if(!XE.v.length)XE.v=[['標準',{}]]}
 function xsave(){if(!XE.n.trim())return alert('種目名を入れてや');if(!Object.keys(XE.pt).length)GP[XE.g].forEach(q=>XE.pt[q]=.7);const o={...XE};if(Object.values(o.pt).every(x=>x==.7))o.pend=1;else delete o.pend;o.mt=Date.now();delete o.nw;delete o.g;D.xo[o.id]=o;save();XE=null;rebuild();LK={};draw()}
@@ -179,11 +183,11 @@ function reqCopy(){const L=EX.filter(e=>e.pend);if(!L.length)return alert('調�
 function vEdit(){const e=XE,sh=e.g=='sh';return`<div class="card"><h3>${e.nw?'種目を追加':'種目を編集'}</h3>
 ${Object.values(e.pt).length&&Object.values(e.pt).every(x=>x==.7)?'<div class="mut" style="margin-bottom:8px">調査待ち：細かい部位は仮の値。設定の「調査待ちをコピー」でチャットに送ると、調べて返すで。</div>':''}
 <input type="text" value="${esc(e.n)}" placeholder="種目名" oninput="XE.n=this.value">
-<div class="row" style="margin-bottom:8px"><select onchange="XE.eq=this.value">${[['B','バーベル'],['D','ダンベル'],['M','マシン'],['C','ケーブル'],['W','自重']].map(a=>`<option value="${a[0]}" ${e.eq==a[0]?'selected':''}>${a[1]}</option>`).join('')}</select><select onchange="xgrp(this.value)">${Object.keys(G).map(g=>`<option value="${g}" ${e.g==g?'selected':''}>部位：${G[g]}</option>`).join('')}</select></div>
+<div class="row" style="margin-bottom:8px"><select onchange="XE.eq=this.value;if(XE.nw)XE.v.forEach(x=>x[2].w=XE.eq=='D'?'e':'t');draw()">${[['B','バーベル'],['D','ダンベル'],['M','マシン'],['C','ケーブル'],['W','自重']].map(a=>`<option value="${a[0]}" ${e.eq==a[0]?'selected':''}>${a[1]}</option>`).join('')}</select><select onchange="xgrp(this.value)">${Object.keys(G).map(g=>`<option value="${g}" ${e.g==g?'selected':''}>部位：${G[g]}</option>`).join('')}</select></div>
 ${sh?`<select style="margin-bottom:8px" onchange="XE.tag=this.value">${[['','肩の分類：指定なし（プレス系）'],['side','肩の分類：中部（サイドレイズ系）'],['rear','肩の分類：後部（リア系）']].map(a=>`<option value="${a[0]}" ${e.tag==a[0]?'selected':''}>${a[1]}</option>`).join('')}</select>`:''}
 <div class="xg" style="margin-bottom:10px"><label>rep下限<input type="number" value="${e.lo}" oninput="XE.lo=+this.value"></label><label>rep上限<input type="number" value="${e.hi}" oninput="XE.hi=+this.value"></label><label>重量刻みkg<input type="number" step="any" value="${e.inc}" oninput="XE.inc=+this.value"></label><label>全身負担1-3<input type="number" value="${e.c}" oninput="XE.c=clamp(+this.value,1,3)"></label></div>
+<h3 style="margin-top:4px">フォーム・やり方</h3><div class="mut" style="margin-bottom:8px">同じ種目の違い（片手/両手、グリップなど）を登録。重量の基準（片側か合計か）と指示もここ。記録はフォームごとに別管理で、片側⇄合計は自動換算する。</div>${e.v.map((x,i)=>`<div class="card" style="background:#f4f6f9;padding:10px;margin-bottom:8px"><input type="text" value="${esc(x[0])}" placeholder="フォーム名（例：ワンハンド）" oninput="XE.v[${i}][0]=this.value"><div class="row" style="margin-bottom:8px"><select onchange="vo(${i},'u',+this.value)"><option value="0" ${x[2].u?'':'selected'}>両手（同時）</option><option value="1" ${x[2].u?'selected':''}>片手・片脚ずつ</option></select><select onchange="vo(${i},'w',this.value)"><option value="t" ${x[2].w=='t'?'selected':''}>重量：合計</option><option value="e" ${x[2].w=='e'?'selected':''}>重量：片側・1個あたり</option></select></div><input type="text" value="${esc(x[2].n||'')}" placeholder="細かい指示（例：肘を体に近づける）" oninput="vo(${i},'n',this.value)"><input type="text" value="${esc(vd(x[1]))}" placeholder="部位の加減（例：tr_l:.2 bi_s:-.1）" oninput="XE.v[${i}][1]=pp(this.value)" style="margin-bottom:0">${i?`<button class="btn g" style="margin-top:8px" onclick="vdel(${i})">このフォームを削除</button>`:''}</div>`).join('')}<button class="btn g" style="margin:0 0 12px" onclick="vadd()">＋ フォームを追加</button><div class="mut" style="margin-bottom:12px">部位ID：${Object.keys(P).map(q=>q+'='+P[q][0]).join('、')}</div>
 <details ${e.nw?'':'open'}><summary style="font-weight:700;margin-bottom:8px">細かい部位の係数${e.nw?'（任意。空なら部位から仮値）':''}</summary><div class="mut" style="margin-bottom:6px">0〜1。主働＝1、補助＝0.2〜0.6。空欄＝効かない</div><div class="xg">${Object.keys(P).map(p=>`<label>${P[p][0]}<input type="number" step="0.1" min="0" max="1.2" value="${e.pt[p]||''}" oninput="xp('${p}',this.value)"></label>`).join('')}</div>
-<div class="mut" style="margin:12px 0 6px">フォーム違い（1行1つ。「名前|部位:加減 …」。1行目は標準）</div><textarea rows="4" oninput="xv(this.value)">${vs(e.v)}</textarea>
 <div class="mut" style="margin-bottom:6px">別名（CSV取り込み用。カンマ区切り）</div><input type="text" value="${esc((e.al||[]).join(','))}" oninput="XE.al=this.value.split(',').map(x=>x.trim()).filter(Boolean)"></details>
 <button class="btn" onclick="xsave()">保存</button><button class="btn g" onclick="XE=null;draw()">キャンセル</button>${e.nw?'':`<button class="btn g" onclick="xdel()">${PRE.some(p=>p.id==e.id)?'プリセットに戻す':'この種目を削除'}</button>`}</div>`}
 function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D)],{type:'application/json'}));a.download='workout-backup.json';a.click()}
