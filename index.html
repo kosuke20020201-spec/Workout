@@ -28,9 +28,9 @@ label.ck{display:inline-flex;gap:6px;margin:4px 14px 4px 0}h3{margin:0 0 8px;fon
 </style></head><body><header><h1>Workout <small style="font-weight:400;opacity:.6">v4</small> <span id="cs" style="float:right;font-size:14px"></span></h1><div class="seg" id="sp"></div></header><main id="v"></main><nav id="nv"></nav>
 <script>
 // 細部位: [名前, 部位グループ, 回復時定数(h), 許容量]
-const P={ch_u:['胸上部','ch',48,4],ch_m:['胸中部','ch',48,4.5],ch_l:['胸下部','ch',48,3.5],ba_l:['広背筋','ba',52,5],ba_u:['上背部','ba',48,4],ba_e:['脊柱起立筋','ba',60,4],
-sh_f:['肩前部','sh',42,3],sh_s:['肩中部','sh',42,3.5],sh_r:['肩後部','sh',42,3],bi_l:['二頭長頭','bi',40,2.5],bi_s:['二頭短頭','bi',40,2.5],bi_b:['上腕筋・腕橈骨筋','bi',40,3],
-tr_l:['三頭長頭','tr',40,3],tr_a:['三頭外側・内側頭','tr',40,3],qu_r:['大腿直筋','qu',60,3.5],qu_v:['広筋群','qu',60,5],ha:['ハム','ha',60,5],gl:['臀部','gl',56,5],ca:['ふくらはぎ','ca',36,3],ab:['腹筋','ab',36,3]};
+const P={ch_u:['胸上部','ch',32,4],ch_m:['胸中部','ch',32,4.5],ch_l:['胸下部','ch',32,3.5],ba_l:['広背筋','ba',34,5],ba_u:['上背部','ba',32,4],ba_e:['脊柱起立筋','ba',40,4],
+sh_f:['肩前部','sh',28,3],sh_s:['肩中部','sh',28,3.5],sh_r:['肩後部','sh',28,3],bi_l:['二頭長頭','bi',26,2.5],bi_s:['二頭短頭','bi',26,2.5],bi_b:['上腕筋・腕橈骨筋','bi',26,3],
+tr_l:['三頭長頭','tr',26,3],tr_a:['三頭外側・内側頭','tr',26,3],qu_r:['大腿直筋','qu',60,3.5],qu_v:['広筋群','qu',60,5],ha:['ハム','ha',60,5],gl:['臀部','gl',56,5],ca:['ふくらはぎ','ca',30,3],ab:['腹筋','ab',28,3]};
 const G={ch:'胸',ba:'背中',sh:'肩',bi:'二頭',tr:'三頭',qu:'大腿四頭',ha:'ハム',gl:'臀部',ca:'ふくらはぎ',ab:'腹筋'},GP={};for(const g in G)GP[g]=Object.keys(P).filter(p=>P[p][1]==g);
 const GL=[['筋力',3,6],['筋肥大',0,0],['高回数',15,25]];
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),esc=s=>String(s).replace(/"/g,'&quot;'),hx=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
