@@ -109,13 +109,16 @@ function fat(){const F={},n=Date.now();for(const p in P)F[p]=0;
 for(const s of D.ses){const h=(n-s.t)/36e5;if(h<0)continue;const L={};
 for(const it of s.it){const e=EXB[it.ex];if(!e)continue;const c=coefOf(e,it.f||0),k=it.s.length;for(const p in c)L[p]=(L[p]||0)+k*c[p]}
 for(const p in L){const f=Math.min(.999,(1-Math.exp(-L[p]/P[p][3]))*Math.exp(-h/P[p][2]));F[p]-=P[p][3]*Math.log(1-f)}}return F}
+function lay(d){const T=[[10,1],[14,.95],[21,.92],[28,.9],[42,.85],[56,.82],[90,.75],[180,.65]];if(d<=10)return 1;for(let i=1;i<T.length;i++)if(d<=T[i][0])return T[i-1][1]+(T[i][1]-T[i-1][1])*(d-T[i-1][0])/(T[i][0]-T[i-1][0]);return .65}
+const LAY=(gd,lf,nr)=>` → ${Math.round(gd)}日空いたので重量を約${Math.round((1-lf)*100)}%下げて、${nr}回で慣らす`;
 function sug(e,fi,gi,F,ov){const G0=GL[gi],lo=G0[1]||e.lo,hi=G0[2]||e.hi,hs=D.ses.filter(s=>s.it.some(i=>i.ex==e.id)).sort((a,b)=>b.t-a.t);
 const f=s=>s.it.find(i=>i.ex==e.id),same=hs.find(s=>(f(s).f||0)==fi),src=same?f(same):hs[0]&&f(hs[0]);
 if(!src)return{w:'',r:lo,lo,hi,note:'初回：軽めで感覚をつかんで重量を入力'};
+const ss=same||hs[0],gd=(Date.now()-ss.t)/864e5,lf=lay(gd),ex=Math.max(1,Math.round((1-lf)*10));
 const o0=ov||(e.v[fi]?e.v[fi][2]:e.v[0][2]),sb=src.b||(e.eq=='D'?'e':'t'),cf=(!o0.u&&!src.u&&sb!=o0.w)?(o0.w=='e'?.5:2):1,it=src.s.map(x=>({w:x.w*cf,r:x.r})),w=Math.max(...it.map(x=>x.w)),rs=it.filter(x=>x.w==w).map(x=>x.r),mr=Math.min(...rs),rd=e.p.reduce((a,g)=>a+Rg(F,g),0)/e.p.length;
 let nw=w,nr,note=`前回 ${+w.toFixed(2)}kg${cf!=1?'（'+(o0.w=='e'?'片側':'合計')+'に換算）':''}×${rs.join(',')}`;
-if(same&&mr>=lo&&mr<=hi){nr=Math.min(mr+1,hi);if(mr>=hi&&e.inc){nw=w+e.inc;nr=lo;note+=' → 上限到達で重量UP'}else note+=mr>=hi?' → 同重量キープ':' → 回数+1'}
-else{const e1=Math.max(...it.map(x=>x.w*(1+x.r/30)));nw=e1/(1+(lo+2)/30);nr=lo;note+=`（推定1RM ${Math.round(e1)}kg → ${lo}回狙いで換算${same?'':'・別フォームの記録から'}）`}
+if(same&&mr>=lo&&mr<=hi){if(lf<1){nw=w*lf;nr=Math.min(hi,mr+ex);note+=LAY(gd,lf,nr)}else{nr=Math.min(mr+1,hi);if(mr>=hi&&e.inc){const bd=e.eq=='D'?'e':'t',best=Math.max(...hs.filter(q=>{const i=f(q);return(i.f||0)==fi&&(i.b||bd)==sb&&Date.now()-q.t<15552e6}).map(q=>Math.max(...f(q).s.map(x=>x.w))))*cf,st=best>w*1.04?2:1;nw=Math.min(w+e.inc*st,Math.max(best,w+e.inc));nr=lo;note+=st>1?` → 上限到達。以前の${+best.toFixed(1)}kgに戻す途中やから2段階UP`:' → 上限到達で重量UP'}else note+=mr>=hi?' → 同重量キープ':' → 回数+1'}}
+else{const e1=Math.max(...it.map(x=>x.w*(1+x.r/30)));nw=e1/(1+(lo+2)/30);nr=lo;note+=`（推定1RM ${Math.round(e1)}kg → ${lo}回狙いで換算${same?'':'・別フォームの記録から'}）`;if(lf<1){nw*=lf;nr=Math.min(hi,lo+ex);note+=LAY(gd,lf,nr)}}
 if(rd<50){nw*=.93;note+='（疲労が残ってるので約7%軽く）'}
 nw=e.inc?Math.round(nw/e.inc)*e.inc:Math.round(nw*10)/10;return{w:+nw.toFixed(2),r:nr,lo,hi,note,lm:[src.m,...src.s.map((x,k)=>x.n?(k+1)+'セット目：'+x.n:'')].filter(Boolean).join(' ／ ')}}
 function plan(){const F=fat(),sp=SP[D.st.split],bud=D.st.budget||sp.b,sc={};
