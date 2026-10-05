@@ -28,9 +28,9 @@ label.ck{display:inline-flex;gap:6px;margin:4px 14px 4px 0}h3{margin:0 0 8px;fon
 </style></head><body><header><h1>Workout <small style="font-weight:400;opacity:.6">v4</small> <span id="cs" style="float:right;font-size:14px"></span></h1><div class="seg" id="sp"></div></header><main id="v"></main><nav id="nv"></nav>
 <script>
 // 細部位: [名前, 部位グループ, 回復時定数(h), 許容量]
-const P={ch_u:['胸上部','ch',32,4],ch_m:['胸中部','ch',32,4.5],ch_l:['胸下部','ch',32,3.5],ba_l:['広背筋','ba',34,5],ba_u:['上背部','ba',32,4],ba_e:['脊柱起立筋','ba',40,4],
-sh_f:['肩前部','sh',28,3],sh_s:['肩中部','sh',28,3.5],sh_r:['肩後部','sh',28,3],bi_l:['二頭長頭','bi',26,2.5],bi_s:['二頭短頭','bi',26,2.5],bi_b:['上腕筋・腕橈骨筋','bi',26,3],
-tr_l:['三頭長頭','tr',26,3],tr_a:['三頭外側・内側頭','tr',26,3],qu_r:['大腿直筋','qu',60,3.5],qu_v:['広筋群','qu',60,5],ha:['ハム','ha',60,5],gl:['臀部','gl',56,5],ca:['ふくらはぎ','ca',30,3],ab:['腹筋','ab',28,3]};
+const P={ch_u:['胸上部','ch',48,4],ch_m:['胸中部','ch',48,4.5],ch_l:['胸下部','ch',48,3.5],ba_l:['広背筋','ba',52,5],ba_u:['上背部','ba',48,4],ba_e:['脊柱起立筋','ba',60,4],
+sh_f:['肩前部','sh',42,3],sh_s:['肩中部','sh',42,3.5],sh_r:['肩後部','sh',42,3],bi_l:['二頭長頭','bi',40,2.5],bi_s:['二頭短頭','bi',40,2.5],bi_b:['上腕筋・腕橈骨筋','bi',40,3],
+tr_l:['三頭長頭','tr',40,3],tr_a:['三頭外側・内側頭','tr',40,3],qu_r:['大腿直筋','qu',60,3.5],qu_v:['広筋群','qu',60,5],ha:['ハム','ha',60,5],gl:['臀部','gl',56,5],ca:['ふくらはぎ','ca',36,3],ab:['腹筋','ab',36,3]};
 const G={ch:'胸',ba:'背中',sh:'肩',bi:'二頭',tr:'三頭',qu:'大腿四頭',ha:'ハム',gl:'臀部',ca:'ふくらはぎ',ab:'腹筋'},GP={};for(const g in G)GP[g]=Object.keys(P).filter(p=>P[p][1]==g);
 const GL=[['筋力',3,6],['筋肥大',0,0],['高回数',15,25]];
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),esc=s=>String(s).replace(/"/g,'&quot;'),hx=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
@@ -46,9 +46,9 @@ const PRE=[
 ['idb','インクラインDBプレス','D','ch_u:1 ch_m:.6 ch_l:.15 sh_f:.6 tr_a:.4 tr_l:.3',2,8,12,2,'','incline dumbbell press,インクライン','標準|;急角度（45°超）|sh_f:.3 ch_m:-.2'],
 ['mcp','マシンチェストプレス','M','ch_m:1 ch_u:.5 ch_l:.4 tr_a:.4 tr_l:.3 sh_f:.3',1,8,12,5,'','chest press,チェストプレス','標準|'],
 ['cf','ケーブルフライ','C','ch_m:1 ch_u:.4 ch_l:.5 sh_f:.2',1,10,15,2.5,'','cable fly,cable crossover','標準|;下から上げる|ch_u:.4 ch_l:-.3'],
-['bor','バーベルロウ','B','ba_u:1 ba_l:.8 ba_e:.5 sh_r:.5 bi_s:.4 bi_l:.4 bi_b:.4 ha:.2',2,6,10,2.5,'','barbell row,bent over row,ローイング','標準|'],
+['bor','バーベルロウ','B','ba_u:1 ba_l:.8 ba_e:.5 sh_r:.5 bi_s:.4 bi_l:.4 bi_b:.4 ha:.2',2,6,10,2.5,'','barbell row,bent over row,ローイング,ベントオーバーロウ','標準|'],
 ['lat','ラットプルダウン','C','ba_l:1 ba_u:.4 bi_s:.5 bi_l:.4 bi_b:.5 tr_l:.2 sh_r:.2',1,8,12,5,'','lat pulldown','標準|;ナロー・ニュートラル|bi_s:.1 ba_u:.1;逆手（アンダー）|bi_s:.3 bi_l:.2 bi_b:.2 ba_u:-.1'],
-['csr','チェストサポートロー','M','ba_u:1 ba_l:.6 sh_r:.5 bi_s:.3 bi_l:.3 bi_b:.3',1,8,12,5,'','chest supported row','標準|'],
+['csr','チェストサポートロー','M','ba_u:1 ba_l:.6 sh_r:.5 bi_s:.3 bi_l:.3 bi_b:.3',1,8,12,5,'','chest supported row,omni grip iso-lateral row','標準|'],
 ['scr','シーテッドケーブルロー','C','ba_u:1 ba_l:.7 ba_e:.2 sh_r:.3 bi_s:.4 bi_l:.4 bi_b:.4',1,8,12,5,'','seated cable row,seated row','標準|'],
 ['dbr','ワンハンドDBロウ','D','ba_l:1 ba_u:.7 sh_r:.4 bi_s:.4 bi_l:.4 bi_b:.5',1,8,12,2,'','dumbbell row,one arm row','標準|'],
 ['dl','デッドリフト','B','ba_e:1 gl:1 ha:1 qu_v:.6 qu_r:.3 ba_u:.6 ba_l:.4 ab:.3',3,3,6,5,'','deadlift','標準|'],
@@ -56,13 +56,13 @@ const PRE=[
 ['dsp','DBショルダープレス','D','sh_f:1 sh_s:.7 tr_a:.5 tr_l:.4 ch_u:.2',2,8,12,2,'','dumbbell shoulder press','標準|'],
 ['lr','ラテラルレイズ','D','sh_s:1 sh_f:.2 sh_r:.2',1,12,20,1,'side','lateral raise,side raise,サイドレイズ','標準|'],
 ['cy','ケーブルYレイズ','C','sh_s:.8 sh_r:.6 ba_u:.4',1,12,20,2.5,'side','y raise','標準|'],
-['fp','フェイスプル','C','sh_r:1 ba_u:.6 sh_s:.4',1,12,20,2.5,'rear','face pull','標準|'],
+['fp','フェイスプル','C','sh_r:1 ba_u:.6 sh_s:.4',1,12,20,2.5,'rear','face pull,cable face pull,フェイスプルアップ,omni directional face pullups','標準|'],
 ['rd','リアデルトフライ','D','sh_r:1 ba_u:.4 sh_s:.2',1,12,20,1,'rear','rear delt fly,reverse fly,リアレイズ','標準|'],
 ['icc','インクラインカール','D','bi_l:1 bi_s:.5 bi_b:.5',1,8,12,2,'','incline curl,incline dumbbell curl','標準|'],
 ['pc','プリーチャーカール','B','bi_s:1 bi_l:.5 bi_b:.6',1,8,12,2.5,'','preacher curl','標準|'],
 ['hc','ハンマーカール','D','bi_b:1 bi_l:.6 bi_s:.4',1,8,12,2,'','hammer curl','標準|'],
 ['cc','ケーブルカール','C','bi_s:.8 bi_l:.8 bi_b:.5',1,10,15,2.5,'','cable curl,barbell curl,dumbbell curl,バーベルカール,ダンベルカール','標準|'],
-['oht','オーバーヘッド・トライセプス・エクステンション','C','tr_l:1 tr_a:.7',1,8,12,2.5,'','overhead triceps extension,triceps extension,french press,OHトライセプスエクステンション','標準（肘を深く曲げる）|;浅め（肘90°まで）|tr_l:-.3'],
+['oht','オーバーヘッド・トライセプス・エクステンション','C','tr_l:1 tr_a:.7',1,8,12,2.5,'','overhead triceps extension,triceps extension,french press,OHトライセプスエクステンション,オーバーヘッド・トライセラトップス・エクステンション','標準（肘を深く曲げる）|;浅め（肘90°まで）|tr_l:-.3'],
 ['pd','プレスダウン','C','tr_a:1 tr_l:.6',1,10,15,2.5,'','pushdown,triceps pushdown,ケーブルトライセプス','標準|;逆手|tr_l:-.3'],
 ['rpd','ロープ・プレスダウン','C','tr_a:1 tr_l:.6',1,10,15,2.5,'','rope pushdown,rope triceps','標準|'],
 ['sc','スカルクラッシャー','B','tr_l:.9 tr_a:.8',1,8,12,2.5,'','skull crusher,lying triceps extension','標準|'],
@@ -102,10 +102,8 @@ const Rp=(F,p,v=0)=>100*Math.exp(-(F[p]+v)/P[p][3]);
 const Rg=(F,g,vf)=>GP[g].reduce((a,p)=>a+Rp(F,p,vf?vf[p]:0),0)/GP[g].length;
 const lastT=id=>{let t=0;for(const s of D.ses)if(s.t>t&&s.it.some(i=>i.ex==id))t=s.t;return t};
 function fat(){const F={},n=Date.now();for(const p in P)F[p]=0;
-// セッションごとに負荷を合計→飽和（1-exp）で疲労率に→時間で指数減衰→複数セッションは「残り回復率の掛け算」で合成。F は等価負荷に戻して返す（Rp/Rg の仕様はそのまま）
-for(const s of D.ses){const h=(n-s.t)/36e5;if(h<0)continue;const L={};
-for(const it of s.it){const e=EXB[it.ex];if(!e)continue;const c=coefOf(e,it.f||0),k=it.s.length;for(const p in c)L[p]=(L[p]||0)+k*c[p]}
-for(const p in L){const f=Math.min(.999,(1-Math.exp(-L[p]/P[p][3]))*Math.exp(-h/P[p][2]));F[p]-=P[p][3]*Math.log(1-f)}}return F}
+for(const s of D.ses){const h=(n-s.t)/36e5;if(h<0)continue;for(const it of s.it){const e=EXB[it.ex];if(!e)continue;const c=coefOf(e,it.f||0),k=it.s.length;
+for(const p in c)F[p]+=k*c[p]*Math.exp(-h/P[p][2])}}return F}
 function sug(e,fi,gi,F,ov){const G0=GL[gi],lo=G0[1]||e.lo,hi=G0[2]||e.hi,hs=D.ses.filter(s=>s.it.some(i=>i.ex==e.id)).sort((a,b)=>b.t-a.t);
 const f=s=>s.it.find(i=>i.ex==e.id),same=hs.find(s=>(f(s).f||0)==fi),src=same?f(same):hs[0]&&f(hs[0]);
 if(!src)return{w:'',r:lo,lo,hi,note:'初回：軽めで感覚をつかんで重量を入力'};
@@ -180,7 +178,7 @@ function done(){const it=[];for(const s of PL.sl){const a=(LG[s.key+'|'+s.e.id+'
 if(!it.length)return alert('チェックの入ったセットがないで');D.ses.push({id:'m'+Date.now(),t:Date.now(),sp:D.st.split,it});D.st.sess='';save();LG={};LK={};SF={};for(const k in OV)delete OV[k];tab='r';draw()}
 function vRec(){const F=PL.F,n=Date.now(),bar=r=>`<div class="bar"><b style="width:${r}%;background:${col(r)}"></b></div>`;
 return'<div class="card"><h3>部位ごとの回復度</h3>'+Object.keys(G).sort((a,b)=>Rg(F,a)-Rg(F,b)).map(g=>{const r=Math.round(Rg(F,g));let t=0;for(const s of D.ses)if(s.t>t&&s.it.some(i=>EXB[i.ex]&&EXB[i.ex].p.includes(g)))t=s.t;
-return`<div class="rc"><span><b>${G[g]}</b><div class="mut" style="font-size:11px">${t?Math.round((n-t)/36e5)+'時間前':'記録なし'}</div></span>${bar(r)}<span>${r}%</span></div>`+(GP[g].length>1?GP[g].map(p=>{const q=Math.round(Rp(F,p));return`<div class="rc sub"><span>${P[p][0]}</span>${bar(q)}<span>${q}%</span></div>`}).join(''):'')}).join('')+'<div class="mut" style="margin-top:8px">セッションごとに、種目・フォームの係数ぶんだけ各部位の負荷を合計し、許容量で頭打ち（飽和）の疲労率にして、部位ごとの回復時間で指数的に減らす簡易モデル。複数セッションの疲労は足し算でなく、残った回復率を掛け合わせて合成。</div></div>'}
+return`<div class="rc"><span><b>${G[g]}</b><div class="mut" style="font-size:11px">${t?Math.round((n-t)/36e5)+'時間前':'記録なし'}</div></span>${bar(r)}<span>${r}%</span></div>`+(GP[g].length>1?GP[g].map(p=>{const q=Math.round(Rp(F,p));return`<div class="rc sub"><span>${P[p][0]}</span>${bar(q)}<span>${q}%</span></div>`}).join(''):'')}).join('')+'<div class="mut" style="margin-top:8px">セットごとに、種目・フォームの係数ぶんだけ各部位に疲労を積み、部位ごとの回復時間で指数的に減らす簡易モデル。</div></div>'}
 function vAdd(){return`<div class="card"><h3>過去の記録を追加</h3><input type="date" id="ad" value="${ldate(Date.now())}" style="margin-bottom:8px"><select id="ae" style="margin-bottom:8px" onchange="aSync()">${Object.keys(G).filter(g=>EX.some(e=>e.p[0]==g)).map(g=>`<optgroup label="${G[g]}">${EX.filter(e=>e.p[0]==g).map(e=>`<option value="${e.id}">${e.n}</option>`).join('')}</optgroup>`).join('')}</select><div class="row" style="margin-bottom:8px"><select id="af" onchange="aSync(this.value)"></select></div><div class="row" style="margin-bottom:8px"><select id="au"><option value="0">両手（同時）</option><option value="1">片手・片脚ずつ</option></select><select id="abz"><option value="t">重量：合計</option><option value="e">重量：片側・1個あたり</option></select></div><input type="text" id="am" placeholder="メモ（フォーム・やり方）"><div id="as">${rowH('','')+rowH('','')+rowH('','')}</div><button class="btn g" style="margin-top:4px" onclick="addRow()">＋セット追加（前のセットをコピー）</button><button class="btn g" onclick="addH()">追加</button></div>`}
 const rowH=(w,r,n)=>`<div class="st"><i></i><input type="number" step="any" inputmode="decimal" placeholder="kg" value="${w}">kg<input type="number" inputmode="numeric" placeholder="回" value="${r}">回<button class="nb" onclick="this.parentNode.querySelector('.sn').classList.toggle('on')">📝</button><button onclick="this.parentNode.remove()" style="border:0;background:none;color:#c33;margin-left:auto;font:inherit;padding:4px 8px">✕</button><input type="text" class="sn ${n?'on':''}" placeholder="このセットのメモ" value="${esc(n||'')}"></div>`;
 function addRow(){const q=[...document.querySelectorAll('#as .st')].pop(),i=q?q.querySelectorAll('input'):[];as.insertAdjacentHTML('beforeend',rowH(i[0]?i[0].value:'',i[1]?i[1].value:''))}
@@ -192,6 +190,7 @@ function vSet(){const q=D.st;return`<div class="card"><h3>クラウド同期（G
 <div class="card"><h3>使える器具</h3>${[['B','バーベル'],['D','ダンベル'],['M','マシン'],['C','ケーブル'],['W','自重']].map(a=>`<label class="ck"><input type="checkbox" ${q.eq[a[0]]?'checked':''} onchange="D.st.eq['${a[0]}']=this.checked?1:0;save();LK={};draw()">${a[1]}</label>`).join('')}</div>
 <div class="card"><h3>種目の編集・追加</h3><div class="mut">名前・部位の係数・フォーム・回数レンジを直せる（✎＝編集済み）。</div>${Object.keys(G).filter(g=>EX.some(e=>e.p[0]==g)).map(g=>{const L=EX.filter(e=>e.p[0]==g);return`<details ${OP.has(g)?'open':''} ontoggle="this.open?OP.add('${g}'):OP.delete('${g}')" style="border-top:1px solid var(--line)"><summary style="padding:10px 0;font-weight:700">${G[g]}　<span class="mut">${L.length}</span></summary>${L.map(e=>`<button class="xl" onclick="xedit('${e.id}')">${e.n}${e.pend?' （調査待ち）':ed(e.id)?' ✎':''}</button>`).join('')}</details>`}).join('')}<button class="btn g" onclick="xnew()">＋ 種目を追加</button><button class="btn g" onclick="reqCopy()">調査待ち（${EX.filter(e=>e.pend).length}件）をコピー</button>
 <div class="mut" style="margin-top:12px">チャットで調べてもらった種目データ（JSON）を貼り付けて反映：</div><textarea id="pj" rows="3" style="margin-top:6px"></textarea><button class="btn g" style="margin-top:0" onclick="pasteX()">貼り付けて追加</button></div>
+<div class="card"><h3>記録JSONを貼り付けて追加</h3><div class="mut" style="margin-bottom:6px">記録アプリのスクショから変換したJSON。種目は日本語名かidで指定。同じ内容は二重に入らへん。</div><textarea id="ps" rows="4" placeholder='[{"date":"2026-10-05","items":[{"ex":"ベンチプレス","form":"標準","sets":[[60,8],[60,7,"セットのメモ"]],"m":"種目の備考"}]}]'></textarea><button class="btn g" style="margin-top:0" onclick="pasteS()">追加</button></div>
 <div class="card"><h3>Workoutアプリの記録を取り込む</h3><div class="mut" style="margin-bottom:8px">CSVの日付・種目・重量・回数の列を自動判別。同じ日は上書き。</div><input type="file" accept=".csv,.txt,text/csv" onchange="impCSV(this.files[0])"></div>
 <div class="card"><h3>バックアップ</h3><button class="btn g" style="margin:0" onclick="exp()">JSONを書き出す</button><button class="btn g" onclick="document.getElementById('jf').click()">JSONから復元</button><input id="jf" type="file" accept=".json" hidden onchange="impJ(this.files[0])"></div>`}
 function xedit(id){const e=EXB[id];XE=JSON.parse(JSON.stringify({id:e.id,n:e.n,eq:e.eq,g:e.p[0],pt:e.pt,c:e.c,lo:e.lo,hi:e.hi,inc:e.inc,tag:e.tag,al:e.al||[],v:e.v}));draw()}
@@ -205,9 +204,9 @@ function xv(t){XE.v=pv(t.replace(/\n/g,';'));if(!XE.v.length)XE.v=[['標準',{}]
 function xsave(){if(!XE.n.trim())return alert('種目名を入れてや');if(!Object.keys(XE.pt).length)GP[XE.g].forEach(q=>XE.pt[q]=.7);const o={...XE};if(Object.values(o.pt).every(x=>x==.7))o.pend=1;else delete o.pend;o.mt=Date.now();delete o.nw;delete o.g;D.xo[o.id]=o;save();XE=null;rebuild();LK={};draw()}
 function xgrp(g){if(g==XE.g)return;if(Object.values(XE.pt).some(x=>x!=.7)&&!confirm('細かい係数を、'+G[g]+'の仮値に置き換える？'))return draw();XE.g=g;XE.pt={};GP[g].forEach(q=>XE.pt[q]=.7);if(g!='sh')XE.tag='';draw()}
 function xdel(){const pre=PRE.some(e=>e.id==XE.id);if(!confirm(pre?'プリセットに戻す？':'この種目を消す？'))return;D.xo[XE.id]={id:XE.id,del:1,mt:Date.now()};save();XE=null;rebuild();LK={};draw()}
-function pasteX(){try{let a=JSON.parse(pj.value);if(!Array.isArray(a))a=[a];a.forEach((o,i)=>{const old=o.id&&EXB[o.id],pt=x=>typeof x=='string'?pp(x):x;if(old){const m={...old};['n','eq','c','lo','hi','inc','tag','al'].forEach(k=>{if(o[k]!=null)m[k]=o[k]});if(o.pt)m.pt=pt(o.pt);if(o.v)m.v=typeof o.v=='string'?pv(o.v):o.v;delete m.pend;m.mt=Date.now();D.xo[m.id]=m;return}
+function pasteX(){try{let a=JSON.parse(pj.value.replace(/```(json)?/gi,'').trim());if(!Array.isArray(a))a=[a];a.forEach((o,i)=>{const old=o.id&&EXB[o.id],pt=x=>typeof x=='string'?pp(x):x;if(old){const m={...old};['n','eq','c','lo','hi','inc','tag','al'].forEach(k=>{if(o[k]!=null)m[k]=o[k]});if(o.pt)m.pt=pt(o.pt);if(o.v)m.v=typeof o.v=='string'?pv(o.v):o.v;delete m.pend;m.mt=Date.now();D.xo[m.id]=m;return}
 if(!o.n||!o.pt)throw 0;const id='u'+Date.now()+i;D.xo[id]={id,mt:Date.now(),n:o.n,eq:o.eq||'M',pt:pt(o.pt),c:o.c||1,lo:o.lo||8,hi:o.hi||12,inc:o.inc==null?2.5:o.inc,tag:o.tag||'',al:o.al||[],v:typeof o.v=='string'?pv(o.v):(o.v||[['標準',{}]])}});save();rebuild();draw();alert(a.length+'件反映した')}catch(e){alert('読み込めへん。JSONの形を確認してや')}}
-function reqCopy(){const L=EX.filter(e=>e.pend);if(!L.length)return alert('調査待ちの種目はないで');const t='次の種目の細かい部位の係数を調べて、JSON配列で返して（各要素は id と pt。ptは「部位ID:係数」を半角スペース区切り。フォーム違いがあれば v も）。\n部位ID: '+Object.keys(P).map(q=>q+'='+P[q][0]).join(', ')+'\n対象:\n'+L.map(e=>`- id:${e.id} ${e.n}（器具:${e.eq}、大まかな部位:${e.p.map(g=>G[g]).join('・')}）`).join('\n');navigator.clipboard?navigator.clipboard.writeText(t).then(()=>alert('コピーした。チャットに貼ってや')).catch(()=>prompt('コピーして貼ってや',t)):prompt('コピーして貼ってや',t)}
+function reqCopy(){const L=EX.filter(e=>e.pend);if(!L.length)return alert('調査待ちの種目はないで');const t='次の種目について、筋電図(EMG)研究などを調べて、細かい部位ごとの関与の強さを0〜1の係数で出して。出力はJSON配列のみ（説明文なし）。各要素は {"id":"下の対象のid","pt":"部位ID:係数 を半角スペース区切り（例 ch_u:1 ch_m:.6 tr_a:.4）"}。フォーム違い（角度やグリップ）があれば "v":"標準|;フォーム名|部位ID:加減 部位ID:加減;別のフォーム|…" も付けて（加減は標準からの増減。例 ch_u:.2 ch_m:-.1）。\n部位ID: '+Object.keys(P).map(q=>q+'='+P[q][0]).join(', ')+'\n対象:\n'+L.map(e=>`- id:${e.id} ${e.n}（器具:${e.eq}、大まかな部位:${e.p.map(g=>G[g]).join('・')}）`).join('\n');navigator.clipboard?navigator.clipboard.writeText(t).then(()=>alert('コピーした。チャットに貼ってや')).catch(()=>prompt('コピーして貼ってや',t)):prompt('コピーして貼ってや',t)}
 function vEdit(){const e=XE,sh=e.g=='sh';return`<div class="card"><h3>${e.nw?'種目を追加':'種目を編集'}</h3>
 ${Object.values(e.pt).length&&Object.values(e.pt).every(x=>x==.7)?'<div class="mut" style="margin-bottom:8px">調査待ち：細かい部位は仮の値。設定の「調査待ちをコピー」でチャットに送ると、調べて返すで。</div>':''}
 <input type="text" value="${esc(e.n)}" placeholder="種目名" oninput="XE.n=this.value">
@@ -218,6 +217,12 @@ ${sh?`<select style="margin-bottom:8px" onchange="XE.tag=this.value">${[['','肩
 <details ${e.nw?'':'open'}><summary style="font-weight:700;margin-bottom:8px">細かい部位の係数${e.nw?'（任意。空なら部位から仮値）':''}</summary><div class="mut" style="margin-bottom:6px">0〜1。主働＝1、補助＝0.2〜0.6。空欄＝効かない</div><div class="xg">${Object.keys(P).map(p=>`<label>${P[p][0]}<input type="number" step="0.1" min="0" max="1.2" value="${e.pt[p]||''}" oninput="xp('${p}',this.value)"></label>`).join('')}</div>
 <div class="mut" style="margin-bottom:6px">別名（CSV取り込み用。カンマ区切り）</div><input type="text" value="${esc((e.al||[]).join(','))}" oninput="XE.al=this.value.split(',').map(x=>x.trim()).filter(Boolean)"></details>
 <button class="btn" onclick="xsave()">保存</button><button class="btn g" onclick="XE=null;draw()">キャンセル</button>${e.nw?'':`<button class="btn g" onclick="xdel()">${PRE.some(p=>p.id==e.id)?'プリセットに戻す':'この種目を削除'}</button>`}</div>`}
+function resolveEx(n){n=String(n);if(EXB[n])return EXB[n];const k=nm(n),k2=nm(n.replace(/[（(].*[)）]/,''));return EX.find(e=>e.k.includes(k))||EX.find(e=>e.k.includes(k2))||null}
+function pasteS(){try{let a=JSON.parse(ps.value.replace(/```(json)?/gi,'').trim());if(!Array.isArray(a))a=[a];const miss=new Set();let n=0;
+for(const d of a){const t=Date.parse(d.date+'T12:00:00');if(isNaN(t))throw 0;const id='ss'+d.date;let q=D.ses.find(s=>s.id==id);if(!q)D.ses.push(q={id,t,sp:'ss',it:[]});
+for(const x of d.items||[]){const e=resolveEx(x.ex);if(!e){miss.add(x.ex);continue}let f=typeof x.form=='number'?x.form:e.v.findIndex(v=>v[0]==x.form);if(f<0)f=0;const o=e.v[f][2],s=(x.sets||[]).map(z=>{const r={w:+z[0]||0,r:+z[1]};if(z[2])r.n=String(z[2]);return r}).filter(z=>z.r>0);if(!s.length)continue;
+const it={ex:e.id,f,b:x.b||o.w,u:x.u==null?o.u:+x.u,s};if(x.m)it.m=x.m;if(q.it.some(i=>JSON.stringify([i.ex,i.f,i.s])==JSON.stringify([it.ex,it.f,it.s])))continue;q.it.push(it);n++}q.mt=Date.now()}
+D.ses=D.ses.filter(s=>s.it.length);save();draw();alert(n+'種目を追加した'+(miss.size?'\n未登録の種目（飛ばした）: '+[...miss].join(' / '):''))}catch(e){alert('読み込めへん。JSONの形を確認してや')}}
 function exp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(D)],{type:'application/json'}));a.download='workout-backup.json';a.click()}
 async function impJ(f){if(!f)return;try{const j=JSON.parse(await f.text());if(!j.ses||!j.st)throw 0;D=j;D.xo=D.xo||{};D.del=D.del||[];save();rebuild();draw()}catch(e){alert('読み込めへん')}}
 function csvRow(l,d){const o=[];let c='',q=0;for(const ch of l){if(ch=='"')q=!q;else if(ch==d&&!q){o.push(c);c=''}else c+=ch}o.push(c);return o.map(x=>x.trim())}
